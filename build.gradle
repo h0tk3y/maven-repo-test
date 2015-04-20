@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 sourceCompatibility = 1.5
-version = '1.0'
+version = '1.1'
 
 apply plugin: 'git-repo'
 apply plugin: 'maven-publish'
@@ -13,6 +13,9 @@ repositories {
 buildscript {
     repositories {
         mavenCentral()
+        repositories {
+            maven { url "https://github.com/h0tk3y/maven-repo-test/releases" }
+        }
     }
     dependencies {
         classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.0'
@@ -24,15 +27,36 @@ gitPublishConfig{
     repo = "maven-repo-test"
 }
 
+task myJar(type: Jar) {
+    classifier 'main'
+    from sourceSets.main.output
+}
+
+artifacts {
+    archives myJar
+}
+
 publishing {
     publications {
-        //...
+        mavenJava(MavenPublication) {
+            groupId 'ru.ctddev.igushkin.repoTest'
+            artifactId 'repoTest'
+            version '2'
+
+            artifact jar {
+                classifier 'app'
+            }
+        }
     }
     repositories {
         maven {
             url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
         }
     }
+}
+
+repositories {
+    git("https://github.com/h0tk3y/maven-repo-test.git", "ru.ifmo.ctddev.igushkin.mavenRepoTest")
 }
 
 dependencies {
